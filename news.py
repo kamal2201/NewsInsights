@@ -163,7 +163,7 @@ def retriever_generator(query, summary):
                 {"role": "user", "content": f"User query: {query} \n news summary: {summary} \n context: {context}"}
             ]
         )
-        return f"{query} {response.choices[0].message.content}"
+        return f"`{response.choices[0].message.content}"
     except Exception as e:
         return f"Error generating insights: {e}"
 
@@ -261,23 +261,21 @@ if __name__ == '__main__':
     st.title("News Insights Explorer")
     st.write("Enter a query to fetch insights and summaries from recent news articles.")
     results = []
-    queries = st.text_input("Enter your query:")
-    # queries = ["trends in soft drinks industry", "coca cola's stand in soft drink industry"]
-    # queries = ['who are the competitors of Coca Cola']
-    if st.button("Get Insights") and queries:
-        st.write("Fetching insights... 🔍")
-        for q in queries:
-            results.extend(fetch_news_insights(q))
+    query = st.text_input("Enter your query:")
 
-        # if "error" in results:
-        #     st.error(results["error"])
-        # else:
-        for item in results:
-            with st.expander(item["title"]):
-                st.subheader("Insights from Reports")
-                st.write(item["insights_from_reports"])
-                st.subheader("Summary")
-                st.write(item["summary"])
-                st.markdown(f"[Read more]({item['url']})", unsafe_allow_html=True)
+    if st.button("Get Insights") and query:
+        st.write("Fetching insights... 🔍")
+        results = fetch_news_insights(query)
+
+        if "error" in results:
+            st.error(results["error"])
+        else:
+            for item in results:
+                with st.expander(item["title"]):
+                    st.subheader("Insights from internal Reports")
+                    st.write(item["insights_from_reports"])
+                    st.subheader("Summary from News")
+                    st.write(item["summary"])
+                    st.markdown(f"[Read more]({item['url']})", unsafe_allow_html=True)
         st.write("Above are the fetched insights...")
     app.run(debug=True, host='0.0.0.0', port=int(os.getenv('PORT', 5000)), use_reloader=False)
